@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Conducir - Delaware</title>
+    <style>
+        :root {
+            --primary: #003366;
+            --secondary: #1a73e8;
+            --success: #28a745;
+            --danger: #dc3545;
+            --bg: #f4f7f6;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 20px; margin: 0; }
+        .quiz-container { width: 100%; max-width: 600px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        
+        /* Pantalla de Inicio */
+        #start-screen { text-align: center; }
+        .hero-icon { font-size: 50px; margin: 20px 0; }
+        .feature-list { text-align: left; background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .feature-item { margin-bottom: 10px; display: flex; align-items: center; }
+        .feature-item::before { content: "✓"; color: var(--success); font-weight: bold; margin-right: 10px; }
+        .tips { text-align: left; font-size: 0.9em; color: #666; border-top: 1px solid #eee; padding-top: 15px; }
+        
+        /* Botones */
+        .btn-main { background: var(--primary); color: white; border: none; padding: 15px 30px; border-radius: 8px; font-size: 1.1em; cursor: pointer; width: 100%; transition: 0.3s; font-weight: bold; }
+        .btn-main:hover { background: #002244; transform: translateY(-2px); }
+
+        /* Estructura del Examen */
+        #quiz-content { display: none; }
+        #progress-bar { height: 6px; background: #eee; border-radius: 3px; margin-bottom: 20px; position: relative; }
+        #progress-fill { height: 100%; background: var(--secondary); width: 0%; border-radius: 3px; transition: 0.3s; }
+        .question-text { font-size: 1.2em; font-weight: bold; color: #333; margin-bottom: 20px; }
+        
+        /* Opciones */
+        .options-list { list-style: none; padding: 0; }
+        .option-item { 
+            padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; margin-bottom: 10px; 
+            cursor: pointer; display: flex; align-items: center; transition: 0.2s; 
+        }
+        .option-item:hover { border-color: var(--secondary); background: #f0f7ff; }
+        .letter { font-weight: bold; margin-right: 15px; background: #eee; padding: 5px 10px; border-radius: 4px; min-width: 20px; text-align: center; }
+        
+        .correct { border-color: var(--success) !important; background: #e9f7ef !important; }
+        .incorrect { border-color: var(--danger) !important; background: #fdf2f2 !important; }
+
+        /* Feedback */
+        #feedback { display: none; padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 0.95em; line-height: 1.5; }
+        .fb-correct { background: #e6fffa; border-left: 5px solid var(--success); color: #1a535c; }
+        .fb-incorrect { background: #fff5f5; border-left: 5px solid var(--danger); color: #742a2a; }
+
+        /* SVG Señales */
+        .svg-box { text-align: center; margin-bottom: 20px; }
+        svg { max-width: 120px; height: auto; }
+
+        /* Resultado Final */
+        #result-screen { display: none; text-align: center; }
+        .percentage { font-size: 4em; font-weight: bold; color: var(--primary); margin: 10px 0; }
+        .stats { font-size: 1.2em; color: #555; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="start-screen">
+        <h1 style="color: var(--primary); margin-bottom: 0;">Examen de Conducir - Delaware</h1>
+        <p style="color: #666;">Practica con señales visuales y situaciones reales de manejo</p>
+        <div class="hero-icon">🚦</div>
+        <h3 style="margin: 10px 0;">Examen Visual Interactivo</h3>
+        <p>30 preguntas con imágenes de señales de tránsito y situaciones de manejo</p>
+        
+        <div class="feature-list">
+            <div class="feature-item">Señales visuales recreadas</div>
+            <div class="feature-item">Situaciones ilustradas</div>
+            <div class="feature-item">Feedback instantáneo</div>
+        </div>
+
+        <button class="btn-main" onclick="startQuiz()">Comenzar Examen Visual</button>
+
+        <div class="tips">
+            <p><strong>💡 Consejos para aprobar:</strong></p>
+            <ul style="padding-left: 20px;">
+                <li>Necesitas 80% o más para aprobar (24 de 30 correctas)</li>
+                <li>Lee cada pregunta cuidadosamente antes de responder</li>
+                <li>Presta atención a las explicaciones después de cada respuesta</li>
+                <li>Las señales están recreadas para ayudarte a identificarlas por forma y color</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="quiz-content">
+        <div id="progress-bar"><div id="progress-fill"></div></div>
+        <p id="q-counter" style="font-size: 0.8em; color: #888; margin: 0;">PREGUNTA 1 DE 30</p>
+        
+        <div id="image-area" class="svg-box"></div>
+        <div class="question-text" id="q-text"></div>
+        
+        <div class="options-list" id="options-container"></div>
+        <div id="feedback"></div>
+        <button id="next-btn" class="btn-main" style="display:none; margin-top: 10px;" onclick="nextQuestion()">Siguiente Pregunta</button>
+    </div>
+
+    <div id="result-screen">
+        <h2 id="result-title"></h2>
+        <div class="percentage" id="res-percent">0%</div>
+        <p class="stats" id="res-stats"></p>
+        <p id="res-msg"></p>
+        <button class="btn-main" onclick="location.reload()">Reiniciar Examen</button>
+    </div>
+</div>
+
+<script>
+    // Gráficos SVG integrados
+    const svgs = {
+        stop: `<svg viewBox="0 0 100 100"><polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="#cc0000" stroke="#fff" stroke-width="2"/></svg>`,
+        yield: `<svg viewBox="0 0 100 100"><polygon points="50,95 5,10 95,10" fill="white" stroke="#cc0000" stroke-width="8"/></svg>`,
+        school: `<svg viewBox="0 0 100 100"><polygon points="50,5 95,45 80,95 20,95 5,45" fill="#ccff00" stroke="#000" stroke-width="2"/></svg>`,
+        warning: `<svg viewBox="0 0 100 100" style="transform: rotate(45deg)"><rect x="15" y="15" width="70" height="70" fill="#ffcc00" stroke="#000" stroke-width="2"/></svg>`,
+        railroad: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#ffcc00" stroke="#000" stroke-width="2"/><line x1="15" y1="15" x2="85" y2="85" stroke="black" stroke-width="5"/><line x1="85" y1="15" x2="15" y2="85" stroke="black" stroke-width="5"/></svg>`,
+        noEntry: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#cc0000"/><rect x="15" y="42" width="70" height="16" fill="white"/></svg>`
+    };
+
+    const database = [
+        { q: "¿Qué indica una señal con esta forma de 8 lados?", img: svgs.stop, a: ["Ceda el paso", "Pare (Alto total)", "No entrar"], c: 1, f: "El octágono es exclusivo para la señal de PARE. Deténgase por completo en la línea." },
+        { q: "¿Qué significa una señal en forma de diamante de color NARANJA?", img: svgs.warning, a: ["Cruce escolar", "Zona de construcción o mantenimiento", "Dirección obligatoria"], c: 1, f: "El naranja advierte siempre sobre zonas de obras o mantenimiento temporal." },
+        { q: "¿Qué debe hacer ante una señal con esta forma triangular?", img: svgs.yield, a: ["Detenerse siempre", "Seguir sin reducir velocidad", "Ceda el paso al tráfico con prioridad"], c: 2, f: "Debe reducir la velocidad y detenerse si otros vehículos tienen la preferencia." },
+        { q: "¿Qué indica esta forma pentagonal de color amarillo/verde?", img: svgs.school, a: ["Zona escolar o cruce de niños", "Cruce de peatones general", "Área de juegos"], c: 0, f: "Esta forma se usa para advertir que está cerca de una escuela o zona de estudiantes." },
+        { q: "¿Qué indica esta señal redonda de advertencia?", img: svgs.railroad, a: ["Cruce de bicicletas", "Cruce de ferrocarril", "Rotonda"], c: 1, f: "Las señales redondas amarillas indican un cruce de vías de tren adelante." },
+        { q: "¿Qué indica una luz ROJA intermitente?", a: ["Se permite pasar con cuidado", "Tratarla como una señal de PARE", "Semáforo fuera de servicio"], c: 1, f: "Equivale a una señal de alto; deténgase y avance solo cuando esté despejado." },
+        { q: "Usted ve esta señal de prohibición. Significa:", img: svgs.noEntry, a: ["Calle sin salida", "No entrar", "Prohibido giros"], c: 1, f: "Significa que no puede entrar en esa calle o rampa en la dirección que circula." },
+        { q: "¿Qué indican las señales de color AZUL?", a: ["Advertencias de peligro", "Servicios al conductor (hospital, comida)", "Información turística"], c: 1, f: "El azul guía hacia servicios como gasolineras, hospitales y alojamiento." },
+        { q: "¿Qué significa una línea AMARILLA sólida de su lado?", a: ["Se permite rebasar", "Prohibido rebasar", "Carril compartido"], c: 1, f: "Una línea sólida prohíbe el adelantamiento por ser una zona de poca visibilidad o peligro." },
+        { q: "¿Qué significa una flecha AMARILLA fija?", a: ["El giro está protegido", "La señal cambiará a rojo pronto", "Siga con precaución"], c: 1, f: "Indica que el tiempo de giro permitido está por terminar; prepárese para parar." },
+        { q: "Distancia mínima para señalizar un giro en Delaware:", a: ["100 pies", "200 pies", "300 pies"], c: 2, f: "Debe activar su direccional al menos 300 pies antes de la maniobra." },
+        { q: "Estacionando CUESTA ARRIBA con bordillo, las ruedas miran:", a: ["Hacia el bordillo", "Hacia afuera del bordillo (hacia la calle)", "Hacia adelante"], c: 1, f: "Esto hace que el bordillo sirva de tope si el vehículo rodara hacia atrás." },
+        { q: "Distancia mínima para estacionar de un hidrante:", a: ["10 pies", "15 pies", "20 pies"], c: 1, f: "Debe dejar libres 15 pies a cada lado para el acceso de bomberos." },
+        { q: "¿Quién tiene prioridad en una rotonda?", a: ["El que entra", "El que ya está dentro", "El vehículo a la derecha"], c: 1, f: "Los que entran deben ceder el paso a quienes ya circulan en el círculo." },
+        { q: "Límite de velocidad en zonas residenciales:", a: ["20 MPH", "25 MPH", "30 MPH"], c: 1, f: "25 MPH es el límite general en Delaware para zonas con casas." },
+        { q: "En vía de 2 carriles, ¿cuándo parar ante un bus escolar?", a: ["Solo si va detrás", "En ambas direcciones", "Solo si el bus tiene niños"], c: 1, f: "Todos deben detenerse en vías simples cuando el bus activa sus luces rojas." },
+        { q: "Espacio mínimo al rebasar a un ciclista:", a: ["1 pie", "2 pies", "3 pies"], c: 2, f: "Debe dejar al menos 3 pies de separación lateral por seguridad." },
+        { q: "La regla de seguimiento recomendada es de:", a: ["2 segundos", "3 segundos", "4 segundos"], c: 2, f: "Delaware recomienda 4 segundos para asegurar tiempo de frenado." },
+        { q: "Si se pasa su salida en la autopista:", a: ["Retroceda", "Gire en U", "Vaya a la siguiente salida"], c: 2, f: "Nunca retroceda ni gire en una autopista. Use la siguiente salida." },
+        { q: "Un semáforo apagado debe tratarse como:", a: ["Pare de 4 vías", "Ceda el paso", "Vía libre"], c: 0, f: "Si no hay luz, todos los conductores deben hacer alto y turnarse para pasar." },
+        { q: "Límite de alcohol (BAC) para adultos (21+):", a: ["0.05%", "0.08%", "0.10%"], c: 1, f: "Con 0.08% o más, se le considera bajo la influencia del alcohol." },
+        { q: "Límite de alcohol para menores de 21:", a: ["0.02% o más", "0.05%", "0.08%"], c: 0, f: "La ley de Tolerancia Cero penaliza a menores con apenas un 0.02%." },
+        { q: "La ley de 'Consentimiento Implicado' trata sobre:", a: ["Seguros", "Pruebas de alcohol/drogas", "Multas"], c: 1, f: "Conducir implica que usted acepta pruebas químicas si es sospechoso de DUI." },
+        { q: "Encienda las luces delanteras siempre que:", a: ["Haya neblina", "Use los limpiaparabrisas", "Ambas son correctas"], c: 2, f: "Si el clima exige limpiaparabrisas, la ley exige luces encendidas." },
+        { q: "¿Quién debe usar cinturón en Delaware?", a: ["Solo el conductor", "Todos los pasajeros", "Solo niños"], c: 1, f: "La ley exige que todos los ocupantes lleven puesto el cinturón de seguridad." },
+        { q: "Si el auto hidroplanea, usted debe:", a: ["Frenar fuerte", "Soltar acelerador y volante recto", "Acelerar"], c: 1, f: "No frene bruscamente; deje que el auto pierda velocidad solo hasta sentir el suelo." },
+        { q: "El uso de celular de mano mientras se conduce está:", a: ["Permitido", "Prohibido", "Permitido en semáforos"], c: 1, f: "Delaware prohíbe el uso de dispositivos de mano para llamadas o textos." },
+        { q: "Si una llanta se revienta, usted debe:", a: ["Frenar seco", "Sujetar volante firme y bajar velocidad", "Girar rápido"], c: 1, f: "No frene. Sujete el volante con fuerza y oríllese gradualmente." },
+        { q: "La 'No-Zone' de un camión es:", a: ["El carril de carga", "Sus puntos ciegos", "Zonas de descanso"], c: 1, f: "Son áreas donde el conductor del camión no puede verlo por los espejos." },
+        { q: "Cambie a luces bajas si un auto viene de frente a:", a: ["200 pies", "500 pies", "1000 pies"], c: 1, f: "A 500 pies debe bajar sus luces para no encandilar al otro conductor." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let shuffledOptions = [];
+
+    function startQuiz() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('quiz-content').style.display = 'block';
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const qData = database[currentIdx];
+        document.getElementById('progress-fill').style.width = `${(currentIdx / database.length) * 100}%`;
+        document.getElementById('q-counter').innerText = `PREGUNTA ${currentIdx + 1} DE ${database.length}`;
+        document.getElementById('q-text').innerText = qData.q;
+        document.getElementById('image-area').innerHTML = qData.img || "";
+        
+        // Mezclar opciones
+        const options = qData.a.map((text, index) => ({ text, isCorrect: index === qData.c }));
+        shuffledOptions = options.sort(() => Math.random() - 0.5);
+
+        const container = document.getElementById('options-container');
+        container.innerHTML = "";
+        const letters = ["A", "B", "C"];
+
+        shuffledOptions.forEach((opt, i) => {
+            const li = document.createElement('div');
+            li.className = 'option-item';
+            li.innerHTML = `<span class="letter">${letters[i]}</span> ${opt.text}`;
+            li.onclick = () => checkAnswer(i, li);
+            container.appendChild(li);
+        });
+
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+    }
+
+    function checkAnswer(idx, element) {
+        const options = document.getElementsByClassName('option-item');
+        const fb = document.getElementById('feedback');
+        const isCorrect = shuffledOptions[idx].isCorrect;
+
+        fb.style.display = 'block';
+        fb.innerText = (isCorrect ? "¡Correcto! " : "Incorrecto. ") + database[currentIdx].f;
+        fb.className = isCorrect ? 'fb-correct' : 'fb-incorrect';
+
+        if(isCorrect) {
+            element.classList.add('correct');
+            score++;
+        } else {
+            element.classList.add('incorrect');
+            // Mostrar la correcta
+            const correctIdx = shuffledOptions.findIndex(o => o.isCorrect);
+            options[correctIdx].classList.add('correct');
+        }
+
+        Array.from(options).forEach(el => el.style.pointerEvents = 'none');
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentIdx++;
+        if(currentIdx < database.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('quiz-content').style.display = 'none';
+        const resScreen = document.getElementById('result-screen');
+        resScreen.style.display = 'block';
+
+        const percent = Math.round((score / database.length) * 100);
+        document.getElementById('res-percent').innerText = `${percent}%`;
+        document.getElementById('res-stats').innerText = `${score} correctas de ${database.length} preguntas`;
+        
+        const resTitle = document.getElementById('result-title');
+        const resMsg = document.getElementById('res-msg');
+
+        if(percent >= 80) {
+            resTitle.innerText = "¡FELICIDADES!";
+            resTitle.style.color = "var(--success)";
+            resMsg.innerText = "Has aprobado el simulador oficial de Delaware.";
+        } else {
+            resTitle.innerText = "SIGUE PRACTICANDO";
+            resTitle.style.color = "var(--danger)";
+            resMsg.innerText = "Necesitas al menos 80% (24 correctas) para aprobar el examen real.";
+        }
+    }
+</script>
+</body>
+</html>
