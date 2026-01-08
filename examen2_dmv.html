@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen Oficial Delaware - Versión Final</title>
+    <style>
+        :root {
+            --primary: #003366;
+            --secondary: #1a73e8;
+            --success: #28a745;
+            --danger: #dc3545;
+            --passed-bg: #d4edda;
+            --locked-bg: #e9ecef;
+            --bg: #f4f7f6;
+        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .quiz-container { width: 100%; max-width: 680px; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        
+        .screen { display: none; }
+        .active { display: block; }
+
+        /* PORTADA */
+        #screen-home { text-align: center; }
+        .hero-title { color: var(--primary); margin-bottom: 5px; font-size: 1.8em; }
+        .hero-subtitle { color: #666; margin-top: 0; font-size: 1em; }
+        .hero-icon { font-size: 45px; margin: 15px 0; }
+        
+        .feature-box { 
+            display: flex; justify-content: space-around; background: #f8f9fa; 
+            padding: 15px; border-radius: 8px; margin: 20px 0; font-size: 0.9em; font-weight: 500;
+        }
+        
+        /* TARJETAS DE EXAMEN (LINKS) */
+        .exam-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+        .exam-card { 
+            padding: 20px; border: 2px solid #ddd; border-radius: 12px; text-align: center;
+            transition: 0.2s; position: relative; background: #fff; display: flex; flex-direction: column; justify-content: space-between;
+        }
+        
+        /* Estados de las tarjetas */
+        .exam-card.locked { opacity: 0.6; background: var(--locked-bg); border-color: #ccc; cursor: not-allowed; }
+        .exam-card.unlocked { border-color: var(--secondary); box-shadow: 0 4px 10px rgba(26, 115, 232, 0.1); cursor: pointer; }
+        .exam-card.unlocked:hover { transform: translateY(-3px); border-color: var(--primary); }
+        .exam-card.passed { background-color: var(--passed-bg); border-color: var(--success); }
+
+        .icon-state { font-size: 2em; margin-bottom: 10px; display: block; }
+        .exam-title { font-weight: bold; color: #333; display: block; margin-bottom: 5px; }
+        .exam-status { font-size: 0.8em; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; display: block; }
+        
+        .btn-enter {
+            background: var(--secondary); color: white; border: none; padding: 8px 15px; 
+            border-radius: 5px; font-size: 0.9em; width: 100%; cursor: pointer; font-weight: bold;
+        }
+        .btn-enter:hover { background: var(--primary); }
+        .locked .btn-enter { display: none; }
+
+        /* PREGUNTAS */
+        .svg-box { text-align: center; margin-bottom: 15px; height: 90px; display: flex; align-items: center; justify-content: center; }
+        svg { max-height: 85px; max-width: 85px; width: auto; }
+        
+        .option-item { 
+            padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; 
+            cursor: pointer; display: flex; align-items: flex-start; transition: 0.2s; font-size: 0.95em;
+        }
+        .option-item:hover { background: #f0f7ff; border-color: var(--secondary); }
+        .letter { font-weight: bold; margin-right: 12px; background: #eee; padding: 2px 8px; border-radius: 4px; min-width: 20px; text-align: center; }
+        
+        .correct { border-color: var(--success) !important; background: #e9f7ef !important; }
+        .incorrect { border-color: var(--danger) !important; background: #fdf2f2 !important; }
+
+        #feedback { padding: 12px; border-radius: 6px; margin: 15px 0; display: none; border-left: 4px solid; font-size: 0.9em; }
+        .fb-success { background: #e6fffa; border-color: var(--success); color: #004d40; }
+        .fb-danger { background: #fff5f5; border-color: var(--danger); color: #742a2a; }
+
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1em; margin-top: 10px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+
+        .progress-bar { height: 6px; background: #eee; border-radius: 3px; margin-bottom: 15px; }
+        .progress-fill { height: 100%; background: var(--success); width: 0%; border-radius: 3px; transition: 0.3s; }
+        
+        .tips-box { text-align: left; font-size: 0.9em; color: #555; border-top: 1px solid #eee; padding-top: 15px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="screen-home" class="screen active">
+        <h1 class="hero-title">Examen de Conducir - Delaware</h1>
+        <p class="hero-subtitle">Practica con señales visuales y situaciones reales de manejo</p>
+        
+        <div class="hero-icon">🚦</div>
+        
+        <h3>Examen Visual Interactivo</h3>
+        <p style="font-size: 0.9em; color: #555;">4 exámenes de 30 preguntas (120 Total)</p>
+
+        <div class="feature-box">
+            <div><span>🛑</span>Señales<br>Recreadas</div>
+            <div><span>🚙</span>Situaciones<br>Ilustradas</div>
+            <div><span>📝</span>Feedback<br>Instantáneo</div>
+        </div>
+
+        <div class="exam-grid" id="exam-selector-area"></div>
+
+        <div class="tips-box">
+            <strong>💡 Consejos para aprobar:</strong>
+            <ul style="padding-left: 20px; margin-top: 5px;">
+                <li>Necesitas 80% o más para aprobar (24 de 30 correctas).</li>
+                <li>Lee cada pregunta cuidadosamente antes de responder.</li>
+                <li>Presta atención a las explicaciones después de cada respuesta.</li>
+                <li>Las señales están recreadas para ayudarte a identificarlas por forma y color.</li>
+            </ul>
+        </div>
+        
+        <div style="text-align: center; margin-top: 15px;">
+            <button onclick="resetStorage()" style="background:none; border:none; color:#999; text-decoration:underline; cursor:pointer; font-size:0.8em;">Reiniciar todo el progreso (Borrar candados)</button>
+        </div>
+    </div>
+
+    <div id="screen-quiz" class="screen">
+        <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.8em; color: #888; margin-bottom: 10px;">
+            <span id="q-exam-name" style="font-weight:bold; color:var(--primary);"></span>
+            <span id="q-counter"></span>
+        </div>
+        
+        <div id="q-image" class="svg-box"></div>
+        <h3 id="q-text" style="margin-top: 0;"></h3>
+        
+        <div id="options-area"></div>
+        <div id="feedback"></div>
+        
+        <button id="btn-next" class="btn btn-primary" style="display:none;" onclick="handleNext()">Siguiente Pregunta →</button>
+    </div>
+
+    <div id="screen-result" class="screen" style="text-align: center;">
+        <h2 id="res-title"></h2>
+        <div style="font-size: 4em; font-weight: bold; margin: 15px 0; color: var(--primary);" id="res-percent">0%</div>
+        <p id="res-stats" style="color: #555; font-size: 1.2em;"></p>
+        <div id="res-action-area"></div>
+        <button class="btn btn-secondary" onclick="showHome()">Volver al Menú Principal</button>
+    </div>
+</div>
+
+<script>
+// IMÁGENES SVG
+const SVGS = {
+    stop: `<svg viewBox="0 0 100 100"><polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="#cc0000" stroke="#fff" stroke-width="2"/><text x="50" y="60" text-anchor="middle" fill="white" font-weight="bold" font-size="18">STOP</text></svg>`,
+    yield: `<svg viewBox="0 0 100 100"><polygon points="50,95 5,10 95,10" fill="white" stroke="#cc0000" stroke-width="8"/><text x="50" y="35" text-anchor="middle" font-size="10" font-weight="bold" fill="#cc0000">CEDA EL</text><text x="50" y="50" text-anchor="middle" font-size="10" font-weight="bold" fill="#cc0000">PASO</text></svg>`,
+    school: `<svg viewBox="0 0 100 100"><polygon points="50,5 95,45 80,95 20,95 5,45" fill="#ccff00" stroke="#000" stroke-width="2"/><path d="M40 70 L50 40 L60 70" stroke="black" stroke-width="3" fill="none"/></svg>`,
+    railroad: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#ffcc00" stroke="#000" stroke-width="2"/><line x1="15" y1="15" x2="85" y2="85" stroke="black" stroke-width="6"/><line x1="85" y1="15" x2="15" y2="85" stroke="black" stroke-width="6"/><text x="50" y="85" font-size="20" text-anchor="middle" font-weight="bold">R R</text></svg>`,
+    noEntry: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#cc0000"/><rect x="20" y="42" width="60" height="16" fill="white"/></svg>`,
+    slippery: `<svg viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" fill="#ffcc00" stroke="black" transform="rotate(45 50 50)"/><path d="M35 70 Q55 60 35 50 Q15 40 35 30" fill="none" stroke="black" stroke-width="4"/><path d="M65 70 Q85 60 65 50 Q45 40 65 30" fill="none" stroke="black" stroke-width="4"/></svg>`,
+    divided: `<svg viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" fill="#ffcc00" stroke="black" transform="rotate(45 50 50)"/><path d="M40 75 V25 M60 75 V25" stroke="black" stroke-width="4"/><path d="M42 30 L58 30 L50 45 Z" fill="black"/></svg>`,
+    merge: `<svg viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" fill="#ffcc00" stroke="black" transform="rotate(45 50 50)"/><path d="M45 80 V30 M45 30 L35 45 M45 30 L55 45 M65 60 Q65 50 45 40" stroke="black" stroke-width="4" fill="none"/></svg>`,
+    noLeft: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="white" stroke="#cc0000" stroke-width="6"/><path d="M65 45 L35 45 L45 35 M35 45 L45 55" fill="none" stroke="black" stroke-width="5"/><line x1="20" y1="20" x2="80" y2="80" stroke="#cc0000" stroke-width="6"/></svg>`,
+    noUturn: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="white" stroke="#cc0000" stroke-width="6"/><path d="M35 60 Q35 35 50 35 Q65 35 65 60" fill="none" stroke="black" stroke-width="5"/><path d="M60 55 L65 65 L70 55" fill="black"/><line x1="20" y1="20" x2="80" y2="80" stroke="#cc0000" stroke-width="6"/></svg>`
+};
+
+const EXAMS_DATA = [
+    {
+        title: "Examen 1: Señales y Reglas",
+        questions: [
+            { q: "Usted se aproxima a una intersección y ve una señal roja de 8 lados. ¿Qué acción es obligatoria?", img: 'stop', a: ["Reducir velocidad", "Detenerse por completo", "Ceder el paso"], c: 1, f: "PARE significa detenerse completamente detrás de la línea límite." },
+            { q: "Una señal en forma de diamante de color naranja indica:", a: ["Zona escolar", "Zona de construcción/mantenimiento", "Cruce de ferrocarril"], c: 1, f: "El naranja se usa exclusivamente para advertencias de zonas de trabajo." },
+            { q: "¿Qué debe hacer ante una señal triangular con el vértice hacia abajo (Triángulo invertido)?", img: 'yield', a: ["Detenerse siempre", "Seguir sin parar", "Ceder el paso al tráfico y peatones"], c: 2, f: "La señal de Ceda el Paso requiere disminuir la velocidad y parar si es necesario." },
+            { q: "Esta señal pentagonal (5 lados) de color amarillo/verde advierte sobre:", img: 'school', a: ["Zona escolar o cruce de niños", "Cruce de peatones general", "Área de juegos"], c: 0, f: "El pentágono indica cercanía a escuelas. Extreme precaución." },
+            { q: "¿Qué indica una señal redonda de color amarillo con una X negra?", img: 'railroad', a: ["No entrar", "Rotonda adelante", "Advertencia de cruce de ferrocarril"], c: 2, f: "Las señales redondas amarillas advierten sobre vías de tren adelante." },
+            { q: "En Delaware, ¿con cuánta anticipación debe señalizar un giro?", a: ["100 pies", "200 pies", "300 pies"], c: 2, f: "Debe activar la señal al menos 300 pies antes de girar." },
+            { q: "¿Qué significa una luz roja intermitente en un semáforo?", a: ["Precaución", "Señal de PARE (Alto total)", "El semáforo no funciona"], c: 1, f: "Debe detenerse por completo y avanzar solo cuando sea seguro." },
+            { q: "Usted ve una señal circular roja con una barra blanca horizontal. Significa:", img: 'noEntry', a: ["Pare", "No entrar", "Calle sin salida"], c: 1, f: "Indica que está prohibido entrar en esa dirección (Do Not Enter)." },
+            { q: "Las señales de color AZUL se utilizan para:", a: ["Reglas de tráfico", "Servicios al conductor (gas, comida)", "Zonas de recreación"], c: 1, f: "El azul guía hacia servicios esenciales en la carretera." },
+            { q: "Una línea amarilla sólida de su lado del carril indica:", a: ["Puede rebasar con cuidado", "Prohibido rebasar", "Carril reversible"], c: 1, f: "No debe cruzar una línea amarilla sólida para adelantar." },
+            { q: "¿Cuál es el límite de velocidad en zonas residenciales de Delaware?", a: ["20 MPH", "25 MPH", "35 MPH"], c: 1, f: "25 MPH es el límite legal en áreas residenciales y de negocios." },
+            { q: "Al estacionar cuesta arriba con bordillo, las ruedas deben girarse:", a: ["Hacia el bordillo", "Hacia afuera (lejos del bordillo)", "Rectas"], c: 1, f: "Hacia afuera, para que el bordillo detenga el auto si rueda atrás." },
+            { q: "Distancia mínima para estacionar de un hidrante (boca de incendio):", a: ["10 pies", "15 pies", "20 pies"], c: 1, f: "Debe dejar 15 pies libres para acceso de bomberos." },
+            { q: "¿Quién tiene la prioridad en una rotonda?", a: ["El que entra", "El que ya circula dentro", "El vehículo más grande"], c: 1, f: "El tráfico entrante debe ceder el paso al tráfico circulante." },
+            { q: "Si un semáforo tiene una flecha amarilla fija, significa:", a: ["Giro protegido", "El intervalo de giro termina, prepárese a parar", "Siga con precaución"], c: 1, f: "Indica que la señal cambiará a rojo inmediatamente." },
+            { q: "¿Qué debe hacer si su auto empieza a hidroplanear?", a: ["Frenar fuerte", "Quitar el pie del acelerador y mantener el volante recto", "Girar rápido"], c: 1, f: "No frene. Deje que el auto pierda velocidad naturalmente." },
+            { q: "Es obligatorio encender las luces delanteras cuando:", a: ["Es de noche", "Usa los limpiaparabrisas por lluvia/nieve", "Ambas situaciones"], c: 2, f: "La ley exige luces encendidas siempre que use limpiaparabrisas." },
+            { q: "Usted ve esta señal (flecha uniéndose a línea recta). Indica:", img: 'merge', a: ["Cruce", "Tráfico incorporándose (Merge)", "Fin de carril"], c: 1, f: "Advierte que el tráfico de otra vía se une a la suya." },
+            { q: "La regla de seguimiento recomendada en Delaware es de:", a: ["2 segundos", "3 segundos", "4 segundos"], c: 2, f: "4 segundos permiten tiempo suficiente de reacción." },
+            { q: "Un borde de acera (curb) pintado de AMARILLO significa:", a: ["Estacionamiento libre", "Prohibido estacionar", "Solo carga"], c: 1, f: "El amarillo indica zona de prohibido estacionar." },
+            { q: "¿Qué significa una línea blanca discontinua?", a: ["Tráfico en sentido contrario", "Separa carriles en la misma dirección", "Borde de vía"], c: 1, f: "Permite cambiar de carril cuando el tráfico va en la misma dirección." },
+            { q: "Si se pasa su salida en la autopista, debe:", a: ["Retroceder por el hombrillo", "Girar en U en la mediana", "Seguir a la próxima salida"], c: 2, f: "Nunca retroceda en una autopista. Es extremadamente peligroso." },
+            { q: "¿Qué debe hacer ante un semáforo apagado (sin luces)?", a: ["Ceder el paso", "Tratarlo como un PARE de 4 vías", "Pasar rápido"], c: 1, f: "Todos los vehículos deben detenerse y turnarse." },
+            { q: "El uso del cinturón de seguridad es obligatorio para:", a: ["Solo el conductor", "Asientos delanteros", "Todos los ocupantes"], c: 2, f: "La ley cubre a todos los pasajeros del vehículo." },
+            { q: "Esta señal con una flecha curva y una barra roja significa:", img: 'noLeft', a: ["Curva peligrosa", "Giro a la izquierda prohibido", "No rebasar"], c: 1, f: "El círculo rojo con barra prohíbe el movimiento indicado." },
+            { q: "Si un peatón lleva un bastón blanco o perro guía:", a: ["Tiene prioridad absoluta", "Solo en cruces marcados", "Tocar la bocina"], c: 0, f: "Los conductores deben ceder el paso siempre a peatones ciegos." },
+            { q: "¿Qué indica esta señal de advertencia (carretera sinuosa)?", img: 'slippery', a: ["Camino de tierra", "Resbaladizo cuando está mojado", "Zona de derrumbes"], c: 1, f: "Reduzca la velocidad cuando llueve si ve esta señal." },
+            { q: "¿Cuál es la penalización por primera ofensa de DUI?", a: ["Multa simple", "Revocación de licencia", "Advertencia"], c: 1, f: "Conlleva revocación de licencia y programa de rehabilitación." },
+            { q: "Al rebasar a un ciclista, debe dejar un espacio de:", a: ["1 pie", "2 pies", "3 pies"], c: 2, f: "La ley de 3 pies protege a los usuarios vulnerables." },
+            { q: "¿Qué indica esta señal (flecha en U tachada)?", img: 'noUturn', a: ["No girar en U", "No estacionar", "No girar a la derecha"], c: 0, f: "Prohíbe dar la vuelta en U en esa intersección." }
+        ]
+    },
+    {
+        title: "Examen 2: Leyes y Seguridad",
+        questions: [
+            { q: "La ley 'Move Over' exige que al ver un vehículo de emergencia detenido:", a: ["Acelere", "Cambie de carril o reduzca velocidad", "Se detenga"], c: 1, f: "Debe dar espacio de seguridad a los oficiales." },
+            { q: "La ley de 'Consentimiento Implicado' significa que usted acepta:", a: ["Pagar multas", "Hacerse pruebas químicas de alcohol/drogas", "Ser registrado"], c: 1, f: "Es condición para tener licencia en Delaware." },
+            { q: "Si el acelerador se pega, la primera acción es:", a: ["Apagar motor", "Cambiar a Neutro (N)", "Frenar a fondo"], c: 1, f: "Neutro desconecta el motor de las ruedas y permite frenar." },
+            { q: "Distancia mínima para seguir a un vehículo de emergencia respondiendo:", a: ["300 pies", "500 pies", "1000 pies"], c: 1, f: "Es ilegal seguirlos a menos de 500 pies." },
+            { q: "En niebla densa, debe usar:", a: ["Luces altas", "Luces bajas", "Solo cuartos"], c: 1, f: "Las altas reflejan en la niebla y ciegan." },
+            { q: "Nivel de alcohol (BAC) para DUI en adultos (21+):", a: ["0.05%", "0.08%", "0.10%"], c: 1, f: "0.08% es el límite legal de intoxicación." },
+            { q: "Puntos necesarios para suspensión de licencia (24 meses):", a: ["10 puntos", "12 puntos", "14 puntos"], c: 2, f: "14 puntos es suspensión obligatoria según el manual." },
+            { q: "Conductor menor de 21 con BAC de 0.02%:", a: ["Multa", "Suspensión por Tolerancia Cero", "Advertencia"], c: 1, f: "Tolerancia cero aplica a menores." },
+            { q: "Girar a la izquierda desde calle de un sentido a otra de un sentido:", a: ["Cualquier carril", "Carril izquierdo a carril izquierdo", "Centro"], c: 1, f: "Mantenga su carril lo más a la izquierda posible." },
+            { q: "¿Qué significa una línea blanca sólida entre carriles?", a: ["Se puede cambiar carril", "Se desaconseja/prohíbe cambiar carril", "Tráfico opuesto"], c: 1, f: "Indica que debe permanecer en su carril." },
+            { q: "Distancia para cambiar de luces altas a bajas con auto de frente:", a: ["200 pies", "500 pies", "300 pies"], c: 1, f: "500 pies para evitar cegar al otro conductor." },
+            { q: "¿Dónde está la 'No-Zone' de un camión?", a: ["Frente", "Puntos ciegos (lados/atrás)", "Techo"], c: 1, f: "Si no ve los espejos del camión, el conductor no lo ve a usted." },
+            { q: "Si un camión va a girar a la derecha:", a: ["Rebasar por derecha", "Esperar detrás", "Tocar bocina"], c: 1, f: "Los camiones se abren a la izquierda para girar a la derecha." },
+            { q: "Multa por no tener seguro (1ra ofensa):", a: ["$100 - $200", "$1,500 - $2,000", "$500"], c: 1, f: "Las multas por falta de seguro son altas." },
+            { q: "Si choca un auto estacionado y no halla al dueño:", a: ["Irse", "Dejar nota con sus datos", "Esperar 10 min"], c: 1, f: "Debe dejar su información visible." },
+            { q: "Los niños deben ir en asiento de seguridad hasta:", a: ["5 años", "8 años o 66 libras", "10 años"], c: 1, f: "Ley de seguridad infantil de Delaware." },
+            { q: "Si se revienta una llanta:", a: ["Frenar seco", "Sujetar volante firme, no frenar", "Girar"], c: 1, f: "Mantenga el control y deje que el auto pare solo." },
+            { q: "Uso de celular para conductores con permiso GDL:", a: ["Manos libres", "Prohibido totalmente", "Solo emergencias"], c: 1, f: "Conductores novatos no pueden usar ningún dispositivo." },
+            { q: "¿Qué indica esta señal (camino dividido comienza)?", img: 'divided', a: ["Fin camino dividido", "Comienzo camino dividido", "Puente"], c: 1, f: "Advierte de una mediana física adelante." },
+            { q: "Al entrar a una autopista, use el carril de aceleración para:", a: ["Parar y mirar", "Igualar velocidad del tráfico", "Ir lento"], c: 1, f: "Debe entrar a la misma velocidad que el flujo." },
+            { q: "La señal de 'Vehículo Lento' es un triángulo:", a: ["Azul", "Naranja fluorescente", "Blanco"], c: 1, f: "Triángulo naranja con borde rojo indica < 25 MPH." },
+            { q: "Distancia para estacionar de un cruce de tren:", a: ["20 pies", "50 pies", "100 pies"], c: 1, f: "50 pies es el mínimo legal." },
+            { q: "Si ve un animal en la carretera:", a: ["Girar bruscamente", "Frenar controlado, no girar bruscamente", "Acelerar"], c: 1, f: "Girar bruscamente causa choques más graves." },
+            { q: "Las motocicletas tienen derecho a:", a: ["Medio carril", "Ancho completo del carril", "Circular por la línea"], c: 1, f: "Tienen los mismos derechos de espacio que un auto." },
+            { q: "Si un oficial le detiene:", a: ["Salga del auto", "Manos en el volante", "Busque documentos rápido"], c: 1, f: "Mantenga las manos visibles por seguridad." },
+            { q: "Hielo negro es:", a: ["Hielo sucio", "Hielo transparente difícil de ver", "Nieve"], c: 1, f: "Es muy peligroso porque parece asfalto mojado." },
+            { q: "Distancia visual (cuántos segundos mirar adelante):", a: ["5 seg", "10 seg", "2 seg"], c: 1, f: "Mire 10-12 segundos adelante para anticipar peligros." },
+            { q: "Si su vehículo empieza a patinar:", a: ["Frene", "Gire hacia donde quiere ir", "Acelere"], c: 1, f: "Corrija la dirección suavemente." },
+            { q: "Los peatones deben caminar:", a: ["De espaldas al tráfico", "De frente al tráfico", "Por el centro"], c: 1, f: "Si no hay acera, camine de frente al tráfico." },
+            { q: "¿Cuándo es más resbaladiza la carretera en lluvia?", a: ["Después de 1 hora", "Los primeros minutos", "Al secarse"], c: 1, f: "El aceite y polvo flotan al inicio de la lluvia." }
+        ]
+    },
+    {
+        title: "Examen 3: Señales Avanzadas y Situaciones",
+        questions: [
+            { q: "Usted ve una señal rectangular blanca que dice 'Left Turn Only'. Esto es una señal de:", a: ["Advertencia", "Regulación (Control)", "Guía"], c: 1, f: "Las señales blancas rectangulares son regulatorias." },
+            { q: "¿De qué color son las señales de zonas de recreación pública?", a: ["Verde", "Marrón", "Azul"], c: 1, f: "El marrón se usa para parques y recreación." },
+            { q: "Si un oficial de policía está dirigiendo el tráfico en un semáforo en rojo:", a: ["Deténgase hasta que cambie a verde", "Obedezca al oficial y pase", "Toque la bocina"], c: 1, f: "Las órdenes del oficial anulan las señales de tráfico." },
+            { q: "Conducir a la defensiva significa:", a: ["Esperar que otros cometan errores", "Conducir despacio", "Tocar la bocina"], c: 0, f: "Debe anticipar errores de otros conductores." },
+            { q: "En una autopista de 3 carriles, el carril izquierdo es para:", a: ["Tráfico lento", "Rebasar solamente", "Camiones"], c: 1, f: "El carril izquierdo es para rebasar o tráfico rápido." },
+            { q: "Si se le caen los limpiaparabrisas en plena lluvia:", a: ["Saque la cabeza por la ventana", "Pare de inmediato fuera de la vía", "Siga despacio"], c: 1, f: "No puede conducir si no tiene visibilidad clara." },
+            { q: "La señal de 'Cruce de Venados' es de color:", a: ["Amarillo", "Naranja", "Blanco"], c: 0, f: "Es una señal de advertencia estándar (amarilla)." },
+            { q: "Al dar marcha atrás (retroceder), usted debe:", a: ["Usar solo los espejos", "Girar la cabeza y mirar atrás", "Tocar la bocina"], c: 1, f: "Los espejos tienen puntos ciegos; mire directamente." },
+            { q: "Si su auto se incendia:", a: ["Acelere para apagarlo", "Use agua", "Salga y aléjese 100 pies"], c: 2, f: "El tanque de gasolina podría explotar." },
+            { q: "Es ilegal estacionar en un cruce de peatones:", a: ["Siempre", "Solo si está marcado", "Solo de día"], c: 0, f: "Nunca bloquee el paso de peatones." },
+            { q: "¿Cuándo puede usar neumáticos con clavos en Delaware?", a: ["Todo el año", "15 Oct - 15 Abr", "Solo en nieve"], c: 1, f: "Están permitidos solo en invierno para evitar daños a la vía." },
+            { q: "Si dos autos llegan a una intersección de 4 altos al mismo tiempo:", a: ["El de la izquierda pasa", "El de la derecha pasa", "El más rápido"], c: 1, f: "El conductor de la izquierda cede al de la derecha." },
+            { q: "La línea de parada (stop line) es:", a: ["Una línea amarilla", "Una línea blanca ancha", "Una línea azul"], c: 1, f: "Indica dónde debe detenerse el parachoques delantero." },
+            { q: "Si conduce con sueño:", a: ["Abra la ventana", "Ponga música fuerte", "Pare y descanse"], c: 2, f: "Solo dormir soluciona la fatiga." },
+            { q: "El alcohol afecta primero:", a: ["La visión", "El juicio y el criterio", "La coordinación"], c: 1, f: "El juicio se ve afectado antes que las habilidades motoras." },
+            { q: "Si un conductor se le pega mucho atrás (tailgating):", a: ["Frene de golpe", "Acelere", "Cámbiese de carril o reduzca velocidad gradualmente"], c: 2, f: "Permita que lo rebase para evitar accidentes." },
+            { q: "En Delaware, ¿quién es responsable de que un menor use cinturón?", a: ["El menor", "El conductor", "Nadie"], c: 1, f: "El conductor recibe la multa." },
+            { q: "Usted debe señalizar para salir de una rotonda:", a: ["No es necesario", "Sí, justo antes de salir", "Solo si hay autos"], c: 1, f: "Indique su intención de salir para no confundir a otros." },
+            { q: "Si ve una luz amarilla intermitente en una zona escolar:", a: ["Acelere", "Reduzca a 20 MPH", "Pare"], c: 1, f: "Indica que el límite escolar está activo." },
+            { q: "¿Qué vehículo debe detenerse siempre en cruces de tren?", a: ["Autos deportivos", "Buses escolares y camiones con materiales peligrosos", "Motos"], c: 1, f: "Están obligados por ley a parar y mirar." },
+            { q: "Si hay neblina, reduzca la velocidad y:", a: ["Aumente la distancia de seguimiento", "Apague las luces", "Use luces altas"], c: 0, f: "Necesita más espacio para detenerse." },
+            { q: "La señal de 'Fin de Carril' (Lane Ends) significa:", a: ["Acelerar", "Fusionarse (Merge) con seguridad", "Parar"], c: 1, f: "Prepárese para cambiar de carril." },
+            { q: "Si toma medicamentos recetados:", a: ["No conduzca si causan sueño", "Conduzca rápido", "Tome café"], c: 0, f: "Revise las advertencias de la etiqueta." },
+            { q: "En un cruce sin semáforos, ceda el paso a:", a: ["Nadie", "Vehículos que ya están en el cruce", "Los de atrás"], c: 1, f: "Quien llega primero o está dentro tiene prioridad." },
+            { q: "Las luces de freno deben ser visibles a:", a: ["100 pies", "300 pies", "500 pies"], c: 1, f: "Requisito legal de equipo." },
+            { q: "Si su auto cae al agua:", a: ["Espere ayuda", "Salga inmediatamente por la ventana", "Llame al 911 dentro"], c: 1, f: "Escape antes de que el auto se hunda." },
+            { q: "No debe conducir en el carril central compartido por más de:", a: ["50 pies", "200 pies", "500 pies"], c: 2, f: "Es solo para preparar giros, no para viajar." },
+            { q: "Si un peatón cruza fuera del paso de cebra:", a: ["Tiene la culpa, atropéllelo", "Ceda el paso de todos modos", "Toque bocina y siga"], c: 1, f: "La ley exige evitar atropellos siempre." },
+            { q: "El registro de su vehículo vence:", a: ["El día de su cumpleaños", "El día que lo compró", "Cuando indica la calcomanía"], c: 2, f: "Verifique la fecha en la placa." },
+            { q: "Para evitar puntos ciegos al conducir:", a: ["Mire solo al frente", "Gire la cabeza antes de cambiar carril", "Confíe en los espejos"], c: 1, f: "Los espejos no muestran todo el panorama." }
+        ]
+    },
+    {
+        title: "Examen 4: Repaso General",
+        questions: [
+            { q: "Si usted se niega a una prueba química (alcoholemia):", a: ["Recibe una multa", "Su licencia será revocada (Consentimiento Implicado)", "No pasa nada"], c: 1, f: "La revocación es automática por negarse." },
+            { q: "Al salir de un estacionamiento privado a la calle:", a: ["Tiene prioridad", "Debe parar y ceder el paso", "Toque bocina"], c: 1, f: "El tráfico en la vía pública tiene prioridad." },
+            { q: "La mejor manera de prevenir el hidroplaneo es:", a: ["Llantas nuevas", "Bajar la velocidad", "Frenar en charcos"], c: 1, f: "La velocidad es el factor principal." },
+            { q: "Si un conductor viene de frente en su carril:", a: ["Frene y gire a la derecha", "Gire a la izquierda", "Toque bocina y siga"], c: 0, f: "Nunca gire a la izquierda (hacia el otro tráfico)." },
+            { q: "Distancia para señalizar en autopista:", a: ["100 pies", "300 pies", "500 pies"], c: 2, f: "A mayor velocidad, mayor distancia de aviso." },
+            { q: "Usted puede girar en U:", a: ["En curvas", "Donde sea seguro y legal", "En cimas de colinas"], c: 1, f: "Prohibido donde la visión sea limitada." },
+            { q: "Límite de velocidad en autopistas divididas (Route 1/I-95):", a: ["55 MPH", "65 MPH", "75 MPH"], c: 1, f: "Generalmente es 65 MPH a menos que se indique otro." },
+            { q: "Si hay un oficial de policía al borde de la vía:", a: ["Siga igual", "Ley Move Over: aléjese o baje velocidad", "Pare a mirar"], c: 1, f: "Aplica también para vehículos de policía." },
+            { q: "Los ciclistas deben obedecer:", a: ["Solo señales de pare", "Las mismas leyes que los autos", "Reglas de peatones"], c: 1, f: "Son considerados vehículos en la vía." },
+            { q: "Si su licencia está suspendida:", a: ["Conduzca solo al trabajo", "No puede conducir bajo ninguna circunstancia", "Conduzca con cuidado"], c: 1, f: "Conducir suspendido es un delito grave." },
+            { q: "El freno de mano se usa:", a: ["Solo en colinas", "Cada vez que estaciona", "Nunca"], c: 1, f: "Asegura el vehículo y mantiene el sistema funcional." },
+            { q: "Si empieza a sentir sueño al conducir:", a: ["Abra la ventana", "Pare en un lugar seguro y duerma", "Suba el volumen"], c: 1, f: "Los trucos no funcionan contra el sueño real." },
+            { q: "En un cruce de peatones sin semáforo:", a: ["Los peatones ceden", "Los autos ceden a los peatones", "El más rápido pasa"], c: 1, f: "El peatón tiene prioridad en el cruce." },
+            { q: "La distancia de reacción es:", a: ["Distancia antes de ver el peligro", "Distancia recorrida mientras mueve el pie al freno", "Distancia total"], c: 1, f: "Es el tiempo que tarda el cerebro en actuar." },
+            { q: "Si su auto se daña en la autopista:", a: ["Pare en el carril", "Mueva el auto al hombrillo", "Abandone el auto"], c: 1, f: "Despeje la vía lo más pronto posible." },
+            { q: "Los niños no deben sentarse en el asiento delantero si:", a: ["Tienen menos de 12 años/65 pulgadas", "Tienen menos de 5 años", "Tienen sueño"], c: 0, f: "Las bolsas de aire pueden herirlos gravemente." },
+            { q: "Un semáforo con flecha roja significa:", a: ["Pare y gire", "No gire en esa dirección", "Ceda el paso"], c: 1, f: "Prohíbe el movimiento en la dirección de la flecha." },
+            { q: "Si ve una señal de 'BUMP' (Bache/Resalto):", a: ["Acelere", "Reduzca velocidad", "Ignore"], c: 1, f: "Advierte de una irregularidad en la superficie." },
+            { q: "El espacio de 'colchón' ideal es:", a: ["Al frente", "Atrás", "Alrededor de todo el vehículo"], c: 2, f: "Mantenga espacio en los 4 lados si es posible." },
+            { q: "Si un animal pequeño sale a la vía:", a: ["Frene de golpe", "Gire bruscamente", "No arriesgue su vida por el animal"], c: 2, f: "Girar puede causar un choque frontal mortal." },
+            { q: "Las multas en zonas de construcción son:", a: ["Iguales", "Dobles", "Triples"], c: 1, f: "Se duplican para proteger a los trabajadores." },
+            { q: "Debe notificar al DMV si cambia de dirección en:", a: ["10 días", "30 días", "60 días"], c: 1, f: "Tiene 30 días para actualizar su registro." },
+            { q: "Conducir agresivamente incluye:", a: ["Seguir muy de cerca y cambios bruscos", "Conducir límite", "Usar direccionales"], c: 0, f: "Es un comportamiento peligroso sancionable." },
+            { q: "Si un bus escolar para en una vía dividida (4 carriles con mediana):", a: ["Todos paran", "Solo su lado para", "Nadie para"], c: 1, f: "Si hay mediana física, el lado opuesto no para." },
+            { q: "El 'Punto de No Retorno' es:", a: ["Cuando ya no puede parar seguro en amarillo", "Mitad de camino", "Un lugar turístico"], c: 0, f: "Debe cruzar si frenar es más peligroso." },
+            { q: "Para evitar fatiga visual nocturna:", a: ["Mire las luces de otros", "Mire hacia el borde derecho", "Cierre un ojo"], c: 1, f: "Evite mirar directo a los faros contrarios." },
+            { q: "Si hay hielo en la carretera:", a: ["Maneje normal", "Reduzca velocidad y aumente distancia", "Use 4x4 y corra"], c: 1, f: "La distancia de frenado aumenta 10 veces." },
+            { q: "Un semáforo amarillo intermitente significa:", a: ["Parar", "Proceder con precaución", "Giro protegido"], c: 1, f: "No requiere parar, solo estar alerta." },
+            { q: "La señal de 'YIELD' es un:", a: ["Octágono", "Triángulo", "Círculo"], c: 1, f: "Triángulo rojo invertido." },
+            { q: "¿Quién es responsable de las condiciones del auto?", a: ["El mecánico", "El conductor", "El pasajero"], c: 1, f: "Usted debe revisar luces, llantas y frenos." }
+        ]
+    }
+];
+
+// --- LÓGICA DE CONTROL ---
+let activeExamIdx = 0;
+let currentQIdx = 0;
+let score = 0;
+let shuffledOptions = [];
+
+function initFirstAvailable() {
+    const progress = JSON.parse(localStorage.getItem('dmv_prog') || "[true, false, false, false]");
+    const passed = JSON.parse(localStorage.getItem('dmv_passed') || "[false, false, false, false]");
+    
+    let target = 0;
+    // Buscar el primer examen disponible que no se haya pasado
+    for(let i=0; i<4; i++) {
+        if(progress[i] && !passed[i]) {
+            target = i;
+            break;
+        }
+        // Si todos los disponibles están pasados, ir al último desbloqueado
+        if(progress[i]) target = i;
+    }
+    startExam(target);
+}
+
+function showHome() {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-home').classList.add('active');
+    
+    const progress = JSON.parse(localStorage.getItem('dmv_prog') || "[true, false, false, false]");
+    const passed = JSON.parse(localStorage.getItem('dmv_passed') || "[false, false, false, false]");
+    
+    const container = document.getElementById('exam-selector-area');
+    container.innerHTML = "";
+
+    EXAMS_DATA.forEach((exam, i) => {
+        const isUnlocked = progress[i];
+        const isPassed = passed[i];
+        const card = document.createElement('div');
+        
+        card.className = `exam-card ${isPassed ? 'passed' : (isUnlocked ? 'unlocked' : 'locked')}`;
+        
+        let icon = isUnlocked ? '🔓' : '🔒';
+        if(isPassed) icon = '✅';
+
+        card.innerHTML = `
+            <span class="icon-state">${icon}</span>
+            <span class="exam-title">${exam.title}</span>
+            <span class="exam-status">${isPassed ? 'APROBADO' : (isUnlocked ? 'DISPONIBLE' : 'BLOQUEADO')}</span>
+            <button class="btn-enter" onclick="event.stopPropagation(); startExam(${i})">ENTRAR</button>
+        `;
+        
+        if(isUnlocked) card.onclick = () => startExam(i);
+        container.appendChild(card);
+    });
+}
+
+function startExam(idx) {
+    activeExamIdx = idx;
+    currentQIdx = 0;
+    score = 0;
+    document.getElementById('screen-home').classList.remove('active');
+    document.getElementById('screen-result').classList.remove('active');
+    document.getElementById('screen-quiz').classList.add('active');
+    loadQuestion();
+}
+
+function loadQuestion() {
+    const qData = EXAMS_DATA[activeExamIdx].questions[currentQIdx];
+    
+    document.getElementById('progress-fill').style.width = `${(currentQIdx / 30) * 100}%`;
+    document.getElementById('q-exam-name').innerText = EXAMS_DATA[activeExamIdx].title;
+    document.getElementById('q-counter').innerText = `PREGUNTA ${currentQIdx + 1} / 30`;
+    
+    document.getElementById('q-text').innerText = qData.q;
+    document.getElementById('q-image').innerHTML = qData.img ? SVGS[qData.img] : "";
+    
+    // Barajar opciones
+    const options = qData.a.map((t, i) => ({ t, ok: i === qData.c }));
+    shuffledOptions = options.sort(() => Math.random() - 0.5);
+
+    const container = document.getElementById('options-area');
+    container.innerHTML = "";
+    
+    const letters = ["A", "B", "C", "D"];
+    shuffledOptions.forEach((opt, i) => {
+        const div = document.createElement('div');
+        div.className = 'option-item';
+        div.innerHTML = `<span class="letter">${letters[i]}</span> <span>${opt.t}</span>`;
+        div.onclick = () => check(i, div);
+        container.appendChild(div);
+    });
+
+    document.getElementById('feedback').style.display = 'none';
+    document.getElementById('btn-next').style.display = 'none';
+}
+
+function check(idx, el) {
+    const isOk = shuffledOptions[idx].ok;
+    const fb = document.getElementById('feedback');
+    fb.style.display = 'block';
+    fb.innerHTML = `<strong>${isOk ? "¡CORRECTO!" : "INCORRECTO"}</strong><br>${EXAMS_DATA[activeExamIdx].questions[currentQIdx].f}`;
+    fb.className = isOk ? 'fb-success' : 'fb-danger';
+
+    if(isOk) { score++; el.classList.add('correct'); }
+    else {
+        el.classList.add('incorrect');
+        const cIdx = shuffledOptions.findIndex(o => o.ok);
+        document.getElementById('options-area').children[cIdx].classList.add('correct');
+    }
+
+    Array.from(document.getElementById('options-area').children).forEach(o => o.style.pointerEvents = 'none');
+    document.getElementById('btn-next').style.display = 'block';
+}
+
+function handleNext() {
+    currentQIdx++;
+    if(currentQIdx < 30) loadQuestion();
+    else showResult();
+}
+
+function showResult() {
+    document.getElementById('screen-quiz').classList.remove('active');
+    const resScreen = document.getElementById('screen-result');
+    resScreen.classList.add('active');
+
+    const percent = Math.round((score / 30) * 100);
+    const passed = percent >= 80;
+
+    document.getElementById('res-percent').innerText = `${percent}%`;
+    document.getElementById('res-percent').style.color = passed ? "var(--success)" : "var(--danger)";
+    document.getElementById('res-stats').innerText = `${score} de 30 respuestas correctas`;
+    document.getElementById('res-title').innerText = passed ? "¡APROBADO!" : "NO APROBADO";
+
+    const actionArea = document.getElementById('res-action-area');
+    actionArea.innerHTML = "";
+
+    if(passed) {
+        let prog = JSON.parse(localStorage.getItem('dmv_prog') || "[true, false, false, false]");
+        let passArr = JSON.parse(localStorage.getItem('dmv_passed') || "[false, false, false, false]");
+        
+        passArr[activeExamIdx] = true;
+        if(activeExamIdx < 3) prog[activeExamIdx + 1] = true;
+        
+        localStorage.setItem('dmv_prog', JSON.stringify(prog));
+        localStorage.setItem('dmv_passed', JSON.stringify(passArr));
+
+        if(activeExamIdx < 3) {
+            const b = document.createElement('button');
+            b.className = "btn btn-primary";
+            b.innerText = "Siguiente Examen →";
+            b.onclick = () => startExam(activeExamIdx + 1);
+            actionArea.appendChild(b);
+        } else {
+            actionArea.innerHTML = "<p style='color:green; font-weight:bold; font-size:1.2em'>🎉 ¡Has completado todo el curso! 🎉</p>";
+        }
+    } else {
+        const b = document.createElement('button');
+        b.className = "btn btn-primary";
+        b.innerText = "Reintentar Examen";
+        b.onclick = () => startExam(activeExamIdx);
+        actionArea.appendChild(b);
+    }
+}
+
+function resetStorage() {
+    if(confirm("¿Seguro que quieres borrar todo tu progreso?")) {
+        localStorage.clear();
+        location.reload();
+    }
+}
+
+// Iniciar
+showHome();
+</script>
+</body>
+</html>
