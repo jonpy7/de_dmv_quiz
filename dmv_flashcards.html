@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards Completas: Manual Delaware</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --bg: #f4f7f6;
+            --text: #333;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
+        h1 { text-align: center; color: var(--primary); margin-bottom: 10px; }
+        p.subtitle { text-align: center; color: #666; max-width: 600px; margin-bottom: 30px; }
+
+        /* Filtros */
+        .filters { margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .filter-btn {
+            padding: 8px 16px; border: none; background: #e0e0e0; border-radius: 20px; cursor: pointer; transition: 0.3s; font-weight: 600;
+        }
+        .filter-btn:hover, .filter-btn.active { background: var(--accent); color: white; }
+
+        /* Grid de Tarjetas */
+        .cards-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; max-width: 1200px; }
+        
+        /* Estilos de la Tarjeta */
+        .flashcard {
+            background-color: transparent;
+            width: 280px;
+            height: 350px; /* Más alto para más texto */
+            perspective: 1000px;
+            cursor: pointer;
+            display: block; /* Para el filtrado */
+        }
+        
+        .flashcard.hidden { display: none; } /* Para ocultar al filtrar */
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 15px;
+        }
+        
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .flashcard-front { background-color: #fff; border-bottom: 4px solid var(--accent); }
+        .flashcard-back { background-color: var(--primary); color: white; transform: rotateY(180deg); }
+
+        /* Contenido de la tarjeta */
+        .category-tag {
+            position: absolute; top: 15px; left: 15px;
+            font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px; color: #999;
+        }
+        .icon-area { font-size: 4em; margin-bottom: 15px; height: 80px; display: flex; align-items: center; justify-content: center;}
+        .icon-img { max-height: 80px; max-width: 100px; }
+        
+        h3 { margin: 0 0 10px 0; font-size: 1.2em; }
+        p { font-size: 0.95em; line-height: 1.4; }
+        
+        .ref-link {
+            position: absolute; bottom: 15px; width: 100%; text-align: center;
+            font-size: 0.75em; opacity: 0.7; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 10px; margin-top: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .flashcard { width: 100%; max-width: 320px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🚗 Estudio Delaware: Manual Completo</h1>
+    <p class="subtitle">Basado en el Manual del Conductor de Delaware. Haz clic para voltear. Usa los filtros para estudiar por tema.</p>
+
+    <div class="filters">
+        <button class="filter-btn active" onclick="filterCards('all')">Todas</button>
+        <button class="filter-btn" onclick="filterCards('reglas')">Reglas de la Vía</button>
+        <button class="filter-btn" onclick="filterCards('senales')">Señales</button>
+        <button class="filter-btn" onclick="filterCards('seguridad')">Seguridad/Clima</button>
+        <button class="filter-btn" onclick="filterCards('leyes')">Leyes/DUI/Licencia</button>
+    </div>
+
+    <div class="cards-container">
+
+        <div class="flashcard senales" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Señales</span>
+                    <div class="icon-area">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Yield_sign.svg/180px-Yield_sign.svg.png" class="icon-img" alt="Yield">
+                    </div>
+                    <h3>Triángulo Invertido</h3>
+                    <p>¿Qué significa esta señal roja y blanca?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>CEDA EL PASO (YIELD)</h3>
+                    <p>Debe reducir la velocidad y ceder el paso al tráfico que cruza. Deténgase si es necesario.</p>
+                    <div class="ref-link">Ref: Manual DE - Sección Señales</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard senales" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Señales</span>
+                    <div class="icon-area">🛑</div>
+                    <h3>Octágono Rojo</h3>
+                    <p>¿Dónde debe detenerse exactamente?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>DETENCIÓN COMPLETA</h3>
+                    <p>En la línea de parada. Si no hay, antes del cruce peatonal. Si no hay, donde pueda ver el tráfico.</p>
+                    <div class="ref-link">Ref: Manual DE - Sección Señales</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard senales" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Señales</span>
+                    <div class="icon-area">❌</div>
+                    <h3>Señal Redonda Amarilla</h3>
+                    <p>¿Qué significa una señal circular amarilla con una X negra y letras RR?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>CRUCE DE TREN</h3>
+                    <p>Advertencia anticipada de cruce de ferrocarril. Reduzca velocidad y mire/escuche.</p>
+                    <div class="ref-link">Ref: Manual DE - Sección Señales</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard senales" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Señales</span>
+                    <div class="icon-area">⬟</div> <h3>Pentágono (5 lados)</h3>
+                    <p>¿Qué indica una señal en forma de casita amarilla o verde neón?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>ZONA ESCOLAR</h3>
+                    <p>Zona escolar o cruce escolar. Esté atento a niños y reduzca la velocidad.</p>
+                    <div class="ref-link">Ref: Manual DE - Sección Señales</div>
+                </div>
+            </div>
+        </div>
+
+         <div class="flashcard senales" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Señales</span>
+                    <div class="icon-area">🟧</div>
+                    <h3>Señales Naranjas</h3>
+                    <p>¿Qué significan las señales de fondo naranja con letras negras?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>CONSTRUCCIÓN</h3>
+                    <p>Advertencia de trabajos en la vía. Las multas se duplican en estas zonas si hay trabajadores.</p>
+                    <div class="ref-link">Ref: Manual DE - Sección Señales</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard reglas" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Reglas</span>
+                    <div class="icon-area">🚗⚡🚙</div>
+                    <h3>4 Altos (4-Way Stop)</h3>
+                    <p>Dos vehículos llegan al mismo tiempo. ¿Quién tiene el derecho de paso?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>VEHÍCULO DE LA DERECHA</h3>
+                    <p>El conductor de la izquierda debe ceder el paso al de la derecha. Si llegan en momentos distintos, pasa el que llegó primero.</p>
+                    <div class="ref-link">Ref: Manual DE - Derecho de Paso</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard reglas" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Reglas</span>
+                    <div class="icon-area">⬅️</div>
+                    <h3>Giro a la Izquierda</h3>
+                    <p>Al girar a la izquierda, ¿a quién debes ceder el paso?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>TRÁFICO EN CONTRA</h3>
+                    <p>Debes esperar a que el tráfico que viene de frente pase o haya un espacio seguro. También cede a peatones.</p>
+                    <div class="ref-link">Ref: Manual DE - Intersecciones</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard reglas" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Reglas</span>
+                    <div class="icon-area">🚌🚨</div>
+                    <h3>Autobús Escolar</h3>
+                    <p>Luces rojas intermitentes y brazo extendido. ¿Cuándo NO necesitas parar?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>CARRETERA DIVIDIDA</h3>
+                    <p>Solo si estás en el lado opuesto de una autopista dividida por una barrera física o mediana.</p>
+                    <div class="ref-link">Ref: Manual DE - Leyes Escolares</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard reglas" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Reglas</span>
+                    <div class="icon-area">🚰</div>
+                    <h3>Hidrante de Incendio</h3>
+                    <p>¿A cuántos pies de distancia debes estacionar de un hidrante?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>15 PIES</h3>
+                    <p>No se permite estacionar a menos de 15 pies de un hidrante.</p>
+                    <div class="ref-link">Ref: Manual DE - Estacionamiento</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard reglas" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Reglas</span>
+                    <div class="icon-area">💡</div>
+                    <h3>Señalizar (Direccionales)</h3>
+                    <p>¿Con cuánta antelación debes poner la direccional antes de girar?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>300 PIES</h3>
+                    <p>Debes señalizar tu intención de girar al menos 300 pies antes del giro.</p>
+                    <div class="ref-link">Ref: Manual DE - Comunicación</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard seguridad" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Seguridad</span>
+                    <div class="icon-area">🌧️🔦</div>
+                    <h3>Lluvia y Luces</h3>
+                    <p>¿Cuándo debes encender las luces delanteras durante el día?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>LIMPIAPARABRISAS = LUCES</h3>
+                    <p>En Delaware, si enciendes los limpiaparabrisas debido al clima, debes encender las luces bajas.</p>
+                    <div class="ref-link">Ref: Manual DE - Clima</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard seguridad" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Seguridad</span>
+                    <div class="icon-area">🌊</div>
+                    <h3>Hidroplaneo</h3>
+                    <p>¿Qué haces si el auto patina sobre el agua?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>NO FRENES</h3>
+                    <p>Suelta el acelerador suavemente. Mantén el volante firme. Deja que el auto pierda velocidad solo.</p>
+                    <div class="ref-link">Ref: Manual DE - Emergencias</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard seguridad" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Seguridad</span>
+                    <div class="icon-area">⏱️</div>
+                    <h3>Distancia de Seguimiento</h3>
+                    <p>¿Cuál es la regla para mantener distancia con el auto de enfrente?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>3 SEGUNDOS</h3>
+                    <p>Cuenta "mil uno, mil dos, mil tres" desde que el auto pasa un punto fijo hasta que tú llegas ahí.</p>
+                    <div class="ref-link">Ref: Manual DE - Manejo Defensivo</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard seguridad" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Seguridad</span>
+                    <div class="icon-area">🚚</div>
+                    <h3>"No-Zone" (Camiones)</h3>
+                    <p>¿Qué es la "No-Zone" de un camión?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>PUNTOS CIEGOS</h3>
+                    <p>Las áreas grandes a los lados, frente y detrás de un camión donde el conductor no puede verte. Si no ves sus espejos, él no te ve.</p>
+                    <div class="ref-link">Ref: Manual DE - Compartir la vía</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard seguridad" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Seguridad</span>
+                    <div class="icon-area">🔦</div>
+                    <h3>Luces Altas</h3>
+                    <p>¿Cuándo debes bajar las luces altas a bajas al ver otro auto?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>500 PIES</h3>
+                    <p>Debes bajar las luces 500 pies antes de un vehículo que se aproxima (de frente) o 200 pies si vas detrás de otro.</p>
+                    <div class="ref-link">Ref: Manual DE - Luces</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard leyes" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Leyes / DUI</span>
+                    <div class="icon-area">🍺🚫</div>
+                    <h3>Límite BAC</h3>
+                    <p>¿Cuál es el límite legal de alcohol para mayores de 21?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>0.08%</h3>
+                    <p>Cualquier nivel superior a 0.08% es delito. Menores de 21 años tienen tolerancia CERO.</p>
+                    <div class="ref-link">Ref: Manual DE - Alcohol y Drogas</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard leyes" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Leyes / DUI</span>
+                    <div class="icon-area">📝</div>
+                    <h3>Consentimiento Implícito</h3>
+                    <p>¿Qué significa esta ley?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>ACEPTAS LA PRUEBA</h3>
+                    <p>Al conducir en DE, aceptas someterte a pruebas químicas si eres arrestado por DUI. Negarse revoca tu licencia.</p>
+                    <div class="ref-link">Ref: Manual DE - Leyes</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flashcard leyes" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Licencia (GDL)</span>
+                    <div class="icon-area">👨‍🏫</div>
+                    <h3>Supervisor (Permiso)</h3>
+                    <p>¿Quién puede ser supervisor de un conductor con permiso nivel 1?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>25 AÑOS + 5 AÑOS LICENCIA</h3>
+                    <p>Un padre/tutor o persona aprobada, mayor de 25 años y con licencia válida por al menos 5 años.</p>
+                    <div class="ref-link">Ref: Manual DE - Licencias</div>
+                </div>
+            </div>
+        </div>
+
+         <div class="flashcard leyes" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Leyes</span>
+                    <div class="icon-area">🚶‍♀️</div>
+                    <h3>Peatones</h3>
+                    <p>¿Quién tiene la preferencia si no hay semáforos?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>SIEMPRE EL PEATÓN</h3>
+                    <p>Los conductores deben ceder el paso a los peatones en cruces marcados y no marcados en intersecciones.</p>
+                    <div class="ref-link">Ref: Manual DE - Reglas</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flashcard leyes" onclick="flip(this)">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <span class="category-tag">Leyes</span>
+                    <div class="icon-area">📱</div>
+                    <h3>Teléfonos Celulares</h3>
+                    <p>¿Está permitido usar el celular mientras conduces?</p>
+                </div>
+                <div class="flashcard-back">
+                    <h3>SOLO MANOS LIBRES</h3>
+                    <p>Es ilegal sostener el teléfono. Conductores con permiso (GDL) no pueden usarlo NI SIQUIERA en manos libres.</p>
+                    <div class="ref-link">Ref: Manual DE - Distracciones</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+    <p style="margin-top: 40px; color: #666; font-size: 0.9em;">
+        Nota: Estas tarjetas son un resumen educativo. Consulte siempre el <a href="https://dmv.de.gov/forms/driver_serv_forms/pdfs/Spanish_manual_LR.pdf" target="_blank" style="color: var(--accent);">Manual Oficial</a>.
+    </p>
+
+    <script>
+        function flip(card) {
+            card.classList.toggle('flipped');
+        }
+
+        function filterCards(category) {
+            let cards = document.querySelectorAll('.flashcard');
+            let buttons = document.querySelectorAll('.filter-btn');
+
+            // Update active button style
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            cards.forEach(card => {
+                if (category === 'all') {
+                    card.classList.remove('hidden');
+                } else {
+                    if (card.classList.contains(category)) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
